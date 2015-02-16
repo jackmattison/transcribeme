@@ -33,6 +33,7 @@ public class SwingSoundRecorder extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JButton buttonRecord = new JButton("Record");
 	private JButton buttonPlay = new JButton("Play");
+
 	private JLabel labelRecordTime = new JLabel("Record Time: 00:00:00");
 
 	private SoundRecordingUtil recorder = new SoundRecordingUtil();
@@ -95,6 +96,8 @@ public class SwingSoundRecorder extends JFrame implements ActionListener {
 			} else {
 				stopPlaying();
 			}
+		} else {
+			System.out.println("ciara");
 		}
 	}
 
@@ -112,6 +115,8 @@ public class SwingSoundRecorder extends JFrame implements ActionListener {
 					buttonPlay.setEnabled(false);
 
 					recorder.start();
+					
+					
 
 				} catch (LineUnavailableException ex) {
 					JOptionPane.showMessageDialog(SwingSoundRecorder.this,
@@ -124,6 +129,7 @@ public class SwingSoundRecorder extends JFrame implements ActionListener {
 		recordThread.start();
 		timer = new RecordTimer(labelRecordTime);
 		timer.start();
+		
 	}
 
 	/**
@@ -143,6 +149,8 @@ public class SwingSoundRecorder extends JFrame implements ActionListener {
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 			saveFile();
+			
+			detectPitch();
 
 		} catch (IOException ex) {
 			JOptionPane.showMessageDialog(SwingSoundRecorder.this, "Error",
@@ -191,6 +199,8 @@ public class SwingSoundRecorder extends JFrame implements ActionListener {
 		playbackThread.start();
 	}
 
+	
+	
 	/**
 	 * Stop playing back.
 	 */
@@ -204,7 +214,7 @@ public class SwingSoundRecorder extends JFrame implements ActionListener {
 	/**
 	 * Save the recorded sound into a WAV file.
 	 */
-	private void saveFile() {
+	public void saveFile() {
 		JFileChooser fileChooser = new JFileChooser();
 		FileFilter wavFilter = new FileFilter() {
 			@Override
@@ -249,8 +259,21 @@ public class SwingSoundRecorder extends JFrame implements ActionListener {
 				ex.printStackTrace();
 			}
 		}
+	
+
 	}
 
+	public String getFileName () {
+		
+		return saveFilePath;
+	}
+
+	public void detectPitch () throws IOException {
+		
+		doFFT s = new doFFT();
+		s.computePitch(saveFilePath);
+	}
+	
 	/**
 	 * launch the program
 	 */
