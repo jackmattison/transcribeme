@@ -35,9 +35,9 @@ public class SoundRecordingUtil {
 		int sampleSizeInBits = 16;
 		int channels = 2;
 		boolean signed = true;
-		boolean bigEndian = true;
+		boolean littleEndian = true;
 		return new AudioFormat(sampleRate, sampleSizeInBits, channels, signed,
-				bigEndian);
+				littleEndian);
 	}
 
 	/**
