@@ -13,12 +13,11 @@ import javax.swing.JLabel;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
+
+
 
 /**
  * A Sound Recorder program in Java Swing.
@@ -30,29 +29,38 @@ public class SwingSoundRecorder extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	
-	private JLabel labelInputChoice = new JLabel("1. Input can be recorded and then saved, or loaded straight from a file:");
+	private JLabel labelInputChoice = new JLabel("1. Input can be recorded and then saved, or chosen as a preset note recording:");
 	private JButton buttonRecord = new JButton("Record file");
-	private JButton buttonOpen = new JButton("Open file");
+	private JButton buttonA0 = new JButton("A0");
+	private JButton buttonA1 = new JButton("A1");
+	private JButton buttonA2 = new JButton("A2");
+	private JButton buttonA3 = new JButton("A3");
+	private JButton buttonA4 = new JButton("A4");
+	private JButton buttonA5 = new JButton("A5");
+	private JButton buttonA6 = new JButton("A6");
+	private JButton buttonA7 = new JButton("A7");
 	private JLabel labelAlgorithmChoice = new JLabel("2. Frequency estimation:");
-	private JButton buttonFFT = new JButton("FFT");
-	private JButton buttonCepstrum = new JButton("Cepstrum");
-	private JButton buttonAdaptiveFiltering = new JButton("Adaptive Filtering");
-	private JButton buttonAutocorrelation = new JButton("Autocorrelation");
+	private JButton buttonFFT = new JButton("Harmonic Product Spectrum");
+	private JButton buttonZeroCrossing = new JButton("Zero Crossing");
+	private JButton buttonYIN = new JButton("YIN");
+	private JButton buttonAutocorrelation = new JButton("Autocorrelation via FFT");
 	private JLabel labelResult = new JLabel("3. The resulting pitch values and confidence measures:");
-	private JLabel resultFFT = new JLabel("  FFT: ");
-	private JLabel resultCepstrum = new JLabel("  Cepstrum:");
-	private JLabel resultAdaptiveFiltering = new JLabel("  Adaptive Filtering:");
-	private JLabel resultAutocorrelation = new JLabel("  Autocorrelation:");
+	private JLabel resultFFT = new JLabel("  HPS: ");
+	private JLabel resultCepstrum = new JLabel("  Zero Crossing:");
+	private JLabel resultYIN = new JLabel("  YIN:");
+	private JLabel resultAutocorrelation = new JLabel("  Autocorrelation via FFT:");
 	private JLabel lineBreak = new JLabel("");
 
 
 	private SoundRecordingUtil recorder = new SoundRecordingUtil();
 	private boolean isRecording = false;
 	private String saveFilePath;
+	private double groundTruth;
+
 
 	public SwingSoundRecorder() {
 		super("Pitch Estimation: Testing Program");
-		super.setSize(600,300);
+		super.setSize(780,300);
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		layout.setAutoCreateGaps(true);
@@ -64,19 +72,25 @@ public class SwingSoundRecorder extends JFrame implements ActionListener {
 				    .addGroup(layout.createSequentialGroup()
 
 			    		.addComponent(buttonRecord)
-			    		 .addComponent(buttonOpen))
-
+			    		 .addComponent(buttonA0)
+			    		 .addComponent(buttonA1)
+			    		 .addComponent(buttonA2)
+			    		 .addComponent(buttonA3)			    		
+			    		 .addComponent(buttonA4)
+			    		 .addComponent(buttonA5)
+			    		 .addComponent(buttonA6)
+			    		 .addComponent(buttonA7))
  			    		.addComponent(labelAlgorithmChoice)
 				    .addGroup(layout.createSequentialGroup()				    
 			    		.addComponent(buttonFFT)
-		 			      .addComponent(buttonCepstrum)
-		 			      .addComponent(buttonAdaptiveFiltering)
+		 			      .addComponent(buttonZeroCrossing)
+		 			      .addComponent(buttonYIN)
 		 			      .addComponent(buttonAutocorrelation))
 		 			.addComponent(labelResult)
 		 			.addComponent(lineBreak)
 		 			.addComponent(resultFFT)
 		 			.addComponent(resultCepstrum)
-		 			.addComponent(resultAdaptiveFiltering)
+		 			.addComponent(resultYIN)
 		 			.addComponent(resultAutocorrelation))
 			);
 			         
@@ -85,30 +99,45 @@ public class SwingSoundRecorder extends JFrame implements ActionListener {
 				         .addComponent(labelInputChoice)
 				         .addGroup(layout.createParallelGroup()
 				                  .addComponent(buttonRecord)
-				                  .addComponent(buttonOpen)))
+				                  .addComponent(buttonA0)
+				                  .addComponent(buttonA1)
+				                  .addComponent(buttonA2)
+				                  .addComponent(buttonA3)
+				                  .addComponent(buttonA4)
+				                  .addComponent(buttonA5)
+				                  .addComponent(buttonA6)
+				                  .addComponent(buttonA7)))
 				    .addComponent(labelAlgorithmChoice)
 				    .addGroup(layout.createSequentialGroup()
 				    	 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				 			      .addComponent(buttonFFT)
-				 			      .addComponent(buttonCepstrum)
-				 			      .addComponent(buttonAdaptiveFiltering)
+				 			      .addComponent(buttonZeroCrossing)
+				 			      .addComponent(buttonYIN)
 				 			      .addComponent(buttonAutocorrelation))
 				 	.addComponent(labelResult)
 				 	.addComponent(lineBreak)
 		 			.addComponent(resultFFT)
 		 			.addComponent(resultCepstrum)
-		 			.addComponent(resultAdaptiveFiltering)
+		 			.addComponent(resultYIN)
 				 	.addComponent(resultAutocorrelation))
 				 	
 				);
 		
-		buttonFFT.setEnabled(false);
 		buttonRecord.addActionListener(this);
 		buttonFFT.addActionListener(this);
-		buttonCepstrum.addActionListener(this);
-		buttonAdaptiveFiltering.addActionListener(this);
+		buttonZeroCrossing.addActionListener(this);
+		buttonYIN.addActionListener(this);
 		buttonAutocorrelation.addActionListener(this);
-
+		
+		buttonA0.addActionListener(this);
+		buttonA1.addActionListener(this);
+		buttonA2.addActionListener(this);
+		buttonA3.addActionListener(this);
+		buttonA4.addActionListener(this);
+		buttonA5.addActionListener(this);
+		buttonA6.addActionListener(this);
+		buttonA7.addActionListener(this);
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 	}
@@ -130,48 +159,91 @@ public class SwingSoundRecorder extends JFrame implements ActionListener {
 		else if (button == buttonFFT) {
 			
 			try {
-				double FFTResult = getFFreq.FFT(saveFilePath);
-				resultFFT.setText("  FFT: "+FFTResult+ "Hz with a confidence of 0.");
+				double FFTResult = getFFreq.HPS(saveFilePath);
+				double FFTConfidence = 1-((Math.abs(groundTruth - FFTResult))/groundTruth);
+				resultFFT.setText("  HPS: "+FFTResult+ "Hz with a confidence of "+FFTConfidence);
 
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
 			}
-		else if (button == buttonCepstrum) {
+		else if (button == buttonZeroCrossing) {
 			
 			try {
-				double cepstrumResult = getFFreq.cepstrum(saveFilePath);
-				resultCepstrum.setText("  Cepstrum: "+cepstrumResult+ "Hz with a confidence of 0.");
+				double cepstrumResult = getFFreq.zeroCrossing(saveFilePath);
+				double cepstrumConfidence = 1-((Math.abs(groundTruth - cepstrumResult))/groundTruth);
+				resultCepstrum.setText("  Zero Crossing: "+cepstrumResult+ "Hz with a confidence of "+cepstrumConfidence);
 
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
 			}
-		else if (button == buttonAdaptiveFiltering) {
-	
-			try {
-				double adaptiveResult = getFFreq.adaptiveFilter(saveFilePath);
-				resultAdaptiveFiltering.setText("  Adaptive Filtering: "+adaptiveResult+ "Hz with a confidence of 0.");
+		else if (button == buttonYIN)
+		{}
+		
 				
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 			
-			}
 		else if (button == buttonAutocorrelation) {
 		
 			try {
 				double autoResult = getFFreq.autocorrelation(saveFilePath);
-				resultAutocorrelation.setText("  Autocorrelation: "+autoResult+ "Hz with a confidence of 0.");
-
+				double autoConfidence = 1-((Math.abs(groundTruth - autoResult))/groundTruth);
+				resultAutocorrelation.setText("  Autocorrelation via FFT: "+autoResult+ "Hz with a confidence of "+autoConfidence);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			
 			}
-		
+		else if (button == buttonA0) {
+			
+			groundTruth = 27.5;
+			saveFilePath = "/users/jackmattison/Documents/notes/A0.wav";
+			
+			}
+		else if (button == buttonA1) {
+			
+			groundTruth = 55;
+			saveFilePath = "/users/jackmattison/Documents/notes/A1.wav";
+			
+			}
+		else if (button == buttonA2) {
+			
+			groundTruth = 110;
+			saveFilePath = "/users/jackmattison/Documents/notes/A2.wav";
+			
+			}
+		else if (button == buttonA3) {
+			
+			groundTruth = 220;
+			saveFilePath = "/users/jackmattison/Documents/notes/A3.wav";
+			
+			}
+		else if (button == buttonA4) {
+			
+			groundTruth = 440;
+			saveFilePath = "/users/jackmattison/Documents/notes/A4tensecs.wav";
+			
+			}
+		else if (button == buttonA5) {
+			
+			groundTruth = 880;
+			saveFilePath = "/users/jackmattison/Documents/notes/A5.wav";
+			
+			}
+		else if (button == buttonA6) {
+			
+			groundTruth = 1760;
+			saveFilePath = "/users/jackmattison/Documents/notes/A6.wav";
+			
+			}
+		else if (button == buttonA7) {
+			
+			groundTruth = 3520;
+			saveFilePath = "/users/jackmattison/Documents/notes/A7.wav";
+			
+			}
 		}
 	
 	/**
